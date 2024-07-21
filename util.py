@@ -38,13 +38,14 @@ def create_vectorstore(pdf_docs):
     text_chunks = split_data(raw_text)  # Get the text chunks
     embeddings = OpenAIEmbeddings(openai_api_key=st.secrets["OPENAI_API_KEY"])
     vectorstore = FAISS.from_texts(texts=text_chunks, embedding=embeddings)
+    # st.session_state.vector_store_db.merge_from(vectorstore)
     return vectorstore
 
 
 # Get response from llm of user asked question
-def get_llm_response(llm, prompt, question):
+def get_llm_response(vs, llm, prompt, question):
     document_chain = create_stuff_documents_chain(llm, prompt)
-    retrieval_chain = create_retrieval_chain(st.session_state.vector_store.as_retriever(), document_chain)
+    retrieval_chain = create_retrieval_chain(vs.as_retriever(), document_chain)
     response = retrieval_chain.invoke({'input': question})
     return response
 
@@ -65,15 +66,21 @@ def analyze_documents(llm, prompt, pdf_docs):
                 'Do not use json keyword in the response')
 
     for pdf in pdf_docs:
-        st.session_state.vector_store = create_vectorstore([pdf])
-        response_json = get_llm_response(llm, prompt, question)
+        vector_store = create_vectorstore([pdf])
+        response_json = get_llm_response(vector_store, llm, prompt, question)
         response = response_json['answer']
-        # print(response)
+
+        # Check if vector_store database is initialized or not
+        if st.session_state.vector_store_db is None:
+            # Initialize the vector-store db
+            st.session_state.vector_store_db = vector_store
+        else:
+            # Merge the vector-stores of each document into vector-store database
+            st.session_state.vector_store_db.merge_from(vector_store)
 
         # Remove backticks from the response
         json_string = response.strip().strip("`")
 
-        # print(json_string)
         json_data = json.loads(json_string)
         data = {
             'Filename': pdf.name,
