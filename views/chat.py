@@ -21,6 +21,7 @@ if "messages" not in st.session_state:
 for msg in st.session_state.messages:
     st.chat_message(msg["role"]).write(msg["content"])
 
+
 container = st.container(border=True)
 question = st.chat_input(placeholder='Enter your question related to uploaded document')
 if question or predefined_query:
@@ -29,6 +30,6 @@ if question or predefined_query:
     st.chat_message("user").write(content)
 
     with st.spinner('Processing...'):
-        st.session_state.response = get_llm_response(llm, prompt, content)
+        st.session_state.response = get_llm_response(st.session_state.vector_store_db, llm, prompt, content)
         st.session_state.messages.append({"role": "assistant", "content": st.session_state.response['answer']})
         st.chat_message("assistant").write(st.session_state.response['answer'])

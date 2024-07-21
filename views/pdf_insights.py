@@ -4,6 +4,8 @@ from util import *
 st.set_page_config(page_title="PDF Insights", page_icon="✨", layout="centered")
 
 # --- SETUP SESSION STATE VARIABLES ---
+if "vector_store_db" not in st.session_state:
+    st.session_state.vector_store_db = None
 if "prompt_list" not in st.session_state:
     st.session_state.prompt_list = []
 if "df" not in st.session_state:
@@ -11,7 +13,7 @@ if "df" not in st.session_state:
 if "thumbnails" not in st.session_state:
     st.session_state.thumbnails = []
 if "vector_store" not in st.session_state:
-    st.session_state.vector_store = False
+    st.session_state.vector_store = None
 if "response" not in st.session_state:
     st.session_state.response = None
 if "conversation" not in st.session_state:
