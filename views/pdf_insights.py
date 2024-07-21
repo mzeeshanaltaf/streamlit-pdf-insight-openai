@@ -12,8 +12,6 @@ if "df" not in st.session_state:
     st.session_state.df = pd.DataFrame(columns=['Filename', 'Filesize', 'Category', 'Keywords', 'Summary'])
 if "thumbnails" not in st.session_state:
     st.session_state.thumbnails = []
-if "vector_store" not in st.session_state:
-    st.session_state.vector_store = None
 if "response" not in st.session_state:
     st.session_state.response = None
 if "conversation" not in st.session_state:
